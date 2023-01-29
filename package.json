@@ -1,0 +1,32 @@
+{
+  "author": "",
+  "dependencies": {
+    "bankid": "^3.1.1",
+    "better-logging": "^5.0.0",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3"
+  },
+  "description": "",
+  "devDependencies": {
+    "eslint": "^8.33.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.6.0",
+    "html-validate": "^7.13.1",
+    "prettier": "2.8.3",
+    "run-script-os": "^1.1.6"
+  },
+  "license": "ISC",
+  "name": "lab3",
+  "private": "true",
+  "scripts": {
+    "lint": "run-script-os",
+    "lint:darwin:linux": "html-validate 'public/**/*.html' ; eslint 'public/**/*.js' 'src/**/*.js' ; prettier --check public/ src/",
+    "lint:fix": "run-script-os",
+    "lint:fix:darwin:linux": "html-validate 'public/**/*.html' ; eslint --fix 'public/**/*.js' 'src/**/*.js' ; prettier --write public/ src/",
+    "lint:fix:win32": "html-validate public/**/*.html & eslint --fix public/**/*.js src/**/*.js & prettier --write public/ src/",
+    "lint:win32": "html-validate public/**/*.html & eslint public/**/*.js src/**/*.js & prettier --check public/ src/",
+    "start": "node --openssl-legacy-provider src/index.js"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}

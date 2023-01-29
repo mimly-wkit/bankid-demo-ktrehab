@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Login BankID | Kognitiva WebMeeting</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="/fonts/fontawesome/css/fontawesome-all.min.css"
+    />
+    <link rel="stylesheet" href="/plugins/animation/css/animate.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="auth-wrapper aut-bg-img">
+      <div class="auth-content">
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="mb-4">
+              <img alt="BankID" src="bankid.png" width="150" />
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <form>
+                  <h3 class="mb-4">Logga in</h3>
+
+                  <label class="float-left d-md-none">Personnummer</label>
+                  <div class="form-group mb-3">
+                    <input
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Personnummer"
+                    />
+                    <span class="text-left font-weight-bold small"
+                      >Personnummer formatera : (YYYYMMDDNNNN)</span
+                    >
+                  </div>
+
+                  <div class="mb-3 text-info">
+                    <i class="fa fa-spinner fa-spin fa-2x d-none"></i>
+                    <span class="load-text"></span>
+                    <span class="error-text text-danger"></span>
+                    <div>
+                      <small
+                        ><a href="#" class="d-none" id="applink"
+                          >Klicka för att öppna BankID</a
+                        ></small
+                      >
+                    </div>
+                  </div>
+                  <input type="hidden" name="redirect" value="" />
+                  <button class="btn btn-primary shadow-2 mb-4" type="submit">
+                    Logga in
+                  </button>
+                  <p class="f-12">
+                    <i class="f-18 fas fa-language"></i> Språk :
+                    <a href="#">English (EN)</a>
+                    /
+                    <a href="#">Svensk (SE)</a>
+                  </p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/js/vendor-all.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/js/pcoded.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document
+          .querySelector("form")
+          .addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+
+            const personalNumber =
+              document.querySelector(".form-control").value;
+            let res = await fetch("/api/auth", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ personalNumber }),
+            });
+            if (res.status === 403) {
+              const { error } = await res.json();
+              document.querySelector(".error-text").innerText = error;
+              return;
+            }
+
+            const { autoStartToken, orderRef } = await res.json();
+
+            document.querySelector(".error-text").innerText = "";
+            document.querySelector(".load-text").innerText =
+              "Kontrollera din BankID-app för att logga in";
+            document.querySelector(".fa-spin").classList.remove("d-none");
+            document.querySelector(
+              "#applink"
+            ).href = `bankid:///?autostarttoken=${autoStartToken}&redirect=/`;
+            document.querySelector("#applink").classList.remove("d-none");
+
+            res = await fetch("/api/collect", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ orderRef }),
+            });
+            if (res.status === 403) {
+              const { error } = await res.json();
+              document.querySelector(".error-text").innerText = error;
+              return;
+            }
+
+            const { url } = await res.json();
+            window.location.href = url;
+          });
+      });
+    </script>
+  </body>
+</html>
